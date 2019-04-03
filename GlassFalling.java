@@ -6,6 +6,17 @@
 
 public class GlassFalling {
 
+	
+	public int min(int x, int y)
+	{
+		if(x < y) return x;
+		return y;
+	}
+	public int max(int x, int y)
+	{
+		if(x > y) return x;
+		return y;
+	}
 
 
   // Do not change the parameters!
@@ -43,22 +54,56 @@ public class GlassFalling {
   // Optional:
 
   // Pick whatever parameters you want to, just make sure to return an int.
-
-  public int glassFallingMemoized() {
-
-    // Fill in here and change the return
-
-    return 0;
-
+  public int glassFallingMemoized(int floors, int sheets) 
+  {
+	  int memo[][] = new int[floors + 1][sheets + 1];
+      
+      // initialization of the double dimension array
+      for (int i = 0; i < floors; i++) 
+      {
+          for (int j = 0; j < sheets; j++) 
+          {
+              memo[i][j] = 0;
+          }
+      }
+      return glassFallingMemoRecur(floors, sheets, memo);
   }
-
+  public int glassFallingMemoRecur(int floors, int sheets, int[][] memo)
+  {
+	 //if value was already computed, return the value so the recursive call
+	 //does not need to recalculate it
+	 if(memo[floors][sheets] != 0)
+	 {
+		 return memo[floors][sheets];
+	 }
+	 //return floors when floors is 0 or 1 since
+	 //when floor is 0 trials are 0 and floors 1 trials is 1
+	 //when sheets is 1 worst case would be # of floors
+	 if(floors == 0 || floors == 1 || sheets == 1)
+	 {
+		 return floors;
+	 }
+	 memo[floors][sheets] = floors;
+	 int memValue;
+	 for(int i = 1; i <= floors; i++) 
+	 {
+		 memValue = max(glassFallingMemoRecur(i - 1, sheets - 1, memo), glassFallingMemoRecur(floors - i, sheets, memo));
+	 
+		 if(memValue < memo[floors][sheets])
+		 {
+			 memo[floors][sheets] = memValue + 1;
+		 }
+	 }
+	 return memo[floors][sheets];
+  }
+ 
 
 
   // Do not change the parameters!
 
   public int glassFallingBottomUp(int floors, int sheets) {
 	  
-    //create an array to store the memoized values
+    //create an array to store the values
     //use #of floors and sheets for the double dimension array
 	//and add 1 or out of bounds exception will be declared due to for loop bounds
 	int[][] glassArray = new int[floors+1][sheets+1];
@@ -89,9 +134,9 @@ public class GlassFalling {
     		{
     			if(glassArray[i - 1][s2 - 1] < glassArray[f2-i][s2])
     			{
-    				trialMin = 1 + glassArray[f2-i][s2];
+    				trialMin = glassArray[f2-i][s2] + 1;
     			}
-    			else trialMin = 1 + glassArray[i-1][s2 - 1];
+    			else trialMin = glassArray[i-1][s2 - 1] + 1;
     			if(trialMin < glassArray[f2][s2]) glassArray[f2][s2] = trialMin;
     		}
     	}
@@ -106,22 +151,24 @@ public class GlassFalling {
   public static void main(String args[]){
 	  
 	  GlassFalling gf = new GlassFalling();
-
+	
+	 
       // Do not touch the below lines of code, and make sure
 
       // in your final turned-in copy, these are the only things printed
 
-      int minTrials1Recur = gf.glassFallingRecur(27, 2);
+      int minTrials1Recur = gf.glassFallingMemoized(27, 2);
 
       int minTrials1Bottom = gf.glassFallingBottomUp(27, 2);
 
-      int minTrials2Recur = gf.glassFallingRecur(100, 3);
+      int minTrials2Recur = gf.glassFallingMemoized(100, 3);
 
       int minTrials2Bottom = gf.glassFallingBottomUp(100, 3);
 
       System.out.println(minTrials1Recur + " " + minTrials1Bottom);
 
       System.out.println(minTrials2Recur + " " + minTrials2Bottom);
+     
 
   }
 
